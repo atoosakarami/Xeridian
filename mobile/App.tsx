@@ -14,7 +14,7 @@ import {
 import { useCallback, useRef, useState } from "react";
 import { extractLandmarks } from "./src/utils/pose";
 import { Landmark, TrackingStatus } from "./src/types/pose";
-import { SquatState, updateSquat } from "./src/exercises/squat";
+import { PushupState, updatePushup } from "./src/exercises/pushup";
 
 const { width, height } = Dimensions.get("window");
 
@@ -22,11 +22,11 @@ export default function App() {
   const [landmarks, setLandmarks] = useState<Landmark[]>([]);
   const [status, setStatus] = useState<TrackingStatus>("searching");
   const [repetitions, setRepetitions] = useState(0);
-  const [squatState, setSquatState] =
-    useState<SquatState>("standing");
-  const [kneeAngle, setKneeAngle] = useState<number | null>(null);
+  const [pushupState, setPushupState] =
+    useState<PushupState>("up");
+  const [elbowAngle, setElbowAngle] = useState<number | null>(null);
 
-  const squatStateRef = useRef<SquatState>("standing");
+  const pushupStateRef = useRef<PushupState>("up");
   const repetitionsRef = useRef(0);
 
   const handleLandmark = useCallback((data: unknown) => {
@@ -40,20 +40,20 @@ export default function App() {
     setLandmarks(nextLandmarks);
     setStatus("tracking");
 
-    const result = updateSquat(
+    const result = updatePushup(
       nextLandmarks,
-      squatStateRef.current,
+      pushupStateRef.current,
       repetitionsRef.current
     );
 
-    squatStateRef.current = result.state;
+    pushupStateRef.current = result.state;
     repetitionsRef.current = result.repetitions;
 
-    setSquatState(result.state);
+    setPushupState(result.state);
     setRepetitions(result.repetitions);
 
-    if (typeof result.kneeAngle === "number") {
-      setKneeAngle(result.kneeAngle);
+    if (typeof result.primaryAngle === "number") {
+      setElbowAngle(result.primaryAngle);
     }
   }, []);
 
@@ -86,16 +86,16 @@ export default function App() {
 
         <View style={styles.statsRow}>
           <View>
-            <Text style={styles.statLabel}>SQUATS</Text>
+            <Text style={styles.statLabel}>PUSH-UPS</Text>
             <Text style={styles.statValue}>{repetitions}</Text>
           </View>
 
           <View>
-            <Text style={styles.statLabel}>KNEE ANGLE</Text>
+            <Text style={styles.statLabel}>ELBOW ANGLE</Text>
             <Text style={styles.statValue}>
-              {kneeAngle === null
+              {elbowAngle === null
                 ? "--"
-                : `${Math.round(kneeAngle)}°`}
+                : `${Math.round(elbowAngle)}°`}
             </Text>
           </View>
         </View>
@@ -103,7 +103,7 @@ export default function App() {
 
       <View pointerEvents="none" style={styles.stateBadge}>
         <Text style={styles.stateText}>
-          {squatState.toUpperCase()}
+          {pushupState.toUpperCase()}
         </Text>
       </View>
 
