@@ -32,6 +32,6 @@ export function updatePushup(
   else if (previousState === "bottom" || previousState === "ascending") state = "ascending";
   else state = "descending";
 
-  const next = previousState === "bottom" && state === "up" ? repetitions + 1 : repetitions;
+  const next = previousState === "ascending" && state === "up" ? repetitions + 1 : repetitions;
   return { state, repetitions: next, primaryAngle: elbowAngle };
 }
